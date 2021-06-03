@@ -7,7 +7,7 @@ export default class JobList extends Component {
     this.retrieveJobs = this.retrieveJobs.bind(this);
     this.searchJobs = this.searchJobs.bind(this);
     this.setActiveJob = this.setActiveJob.bind(this);
-    this.onChangeQuery = this.onChangeQuery.bind(this);
+    this.handleChange = this.handleChange.bind(this);
 
     this.state = {
       jobs: [],
@@ -22,6 +22,11 @@ export default class JobList extends Component {
   }
 
   retrieveJobs() {
+    this.setState({
+      currentJob: null,
+      currentIndex: -1,
+      query: "",
+    });
     JobDataService.getJobs()
       .then((response) => {
         this.setState({
@@ -35,7 +40,13 @@ export default class JobList extends Component {
   }
 
   searchJobs() {
-    JobDataService.searchJobs()
+    this.setState({
+      currentJob: null,
+      currentIndex: -1,
+      jobs: [],
+    });
+    console.log(this.state.query);
+    JobDataService.searchJobs(this.state.query)
       .then((response) => {
         this.setState({
           jobs: response.data,
@@ -47,15 +58,17 @@ export default class JobList extends Component {
       });
   }
 
-  onChangeQuery(e) {
+  handleChange(e) {
     this.setState({
       query: e.target.value,
-      currentJob: null,
-      currentIndex: -1,
-      jobs: [],
     });
-    this.searchJobs();
   }
+
+  handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      this.searchJobs();
+    }
+  };
 
   setActiveJob(job, index) {
     this.setState({
@@ -71,13 +84,23 @@ export default class JobList extends Component {
       <div>
         <br />
         <div className="form-group">
-          <label htmlFor="title">Search</label>
-          <br />
           <input
             type="text"
             value={this.state.query}
-            onChange={this.onChangeQuery}
+            onChange={this.handleChange}
+            onKeyPress={this.handleKeyPress}
           />
+        </div>
+        <div>
+          <button onClick={this.searchJobs} className="btn btn-sm btn-success">
+            Search
+          </button>
+          <button
+            onClick={this.retrieveJobs}
+            className="m-3 btn btn-sm btn-danger"
+          >
+            Clear
+          </button>
         </div>
         <br />
         <div className="list row">
@@ -110,25 +133,29 @@ export default class JobList extends Component {
                   </label>{" "}
                   {currentJob.jobTitle}
                 </div>
+                <br />
                 <div>
                   <label>
                     <strong>Company Name:</strong>
                   </label>{" "}
                   {currentJob.companyName}
                 </div>
+                <br />
                 <div>
                   <label>
                     <strong>Job Description:</strong>
                   </label>{" "}
                   {currentJob.jobDescription}
                 </div>
+                <br />
                 <div>
                   <label>
                     <strong>Skills:</strong>
                   </label>{" "}
                   {currentJob.skills}
                 </div>
-                <form action={currentJob.jobAppUrl}>
+                <br />
+                <form action={currentJob.jobAppUrl} target="_blank">
                   <input type="submit" value="Apply" />
                 </form>
               </div>
