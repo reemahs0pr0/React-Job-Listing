@@ -2,6 +2,8 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+The job listings data are obtained by consuming Rest API from the Jinder application. This simple application will show details of selected job with the 'Apply' button linking to the job home website. Searc queries will be sent to the back-end of the Jinder application which will return a sorted job listings based on ML.
+
 ## Available Scripts
 
 In the project directory, you can run:
