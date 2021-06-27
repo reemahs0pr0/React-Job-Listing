@@ -117,6 +117,7 @@ export default class JobList extends Component {
                     }
                     onClick={() => this.setActiveJob(job, index)}
                     key={index}
+                    style={{ cursor: "pointer" }}
                   >
                     {job.jobTitle}
                   </li>
