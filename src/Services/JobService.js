@@ -9,6 +9,12 @@ class JobDataService {
   searchJobs(query) {
     return axios.get(JOB_API_BASE_URL + query);
   }
+  getSortedJobs(id) {
+    return axios.get(JOB_API_BASE_URL + "sorted/" + id);
+  }
+  searchSortedJobs(id, query) {
+    return axios.get(JOB_API_BASE_URL + "sorted/" + id + "/" + query);
+  }
 }
 
 export default new JobDataService();

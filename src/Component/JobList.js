@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import JobDataService from "../Services/JobService";
+import JobSeekerDataService from "../Services/JobSeekerService";
 
 export default class JobList extends Component {
   constructor(props) {
@@ -14,11 +15,23 @@ export default class JobList extends Component {
       currentJob: null,
       currentIndex: -1,
       query: "",
+      user: props.user,
     };
+    console.log(this.state.user);
   }
 
   componentDidMount() {
-    this.retrieveJobs();
+    JobSeekerDataService.login(this.state.user.userName)
+      .then((response) => {
+        this.setState({
+          user: response.data,
+        });
+        console.log(response.data);
+        this.retrieveJobs();
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   }
 
   retrieveJobs() {
@@ -27,16 +40,29 @@ export default class JobList extends Component {
       currentIndex: -1,
       query: "",
     });
-    JobDataService.getJobs()
-      .then((response) => {
-        this.setState({
-          jobs: response.data,
+    if (this.state.user.resumeUrl == null) {
+      JobDataService.getJobs()
+        .then((response) => {
+          this.setState({
+            jobs: response.data,
+          });
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
         });
-        console.log(response.data);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    } else {
+      JobDataService.getSortedJobs(this.state.user.id)
+        .then((response) => {
+          this.setState({
+            jobs: response.data,
+          });
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
   }
 
   searchJobs() {
@@ -46,16 +72,29 @@ export default class JobList extends Component {
       jobs: [],
     });
     console.log(this.state.query);
-    JobDataService.searchJobs(this.state.query)
-      .then((response) => {
-        this.setState({
-          jobs: response.data,
+    if (this.state.user.resumeUrl == null) {
+      JobDataService.searchJobs(this.state.query)
+        .then((response) => {
+          this.setState({
+            jobs: response.data,
+          });
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
         });
-        console.log(response.data);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    } else {
+      JobDataService.searchSortedJobs(this.state.user.id, this.state.query)
+        .then((response) => {
+          this.setState({
+            jobs: response.data,
+          });
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
   }
 
   handleChange(e) {
@@ -119,7 +158,11 @@ export default class JobList extends Component {
                     key={index}
                     style={{ cursor: "pointer" }}
                   >
-                    {job.jobTitle}
+                    <span>
+                      <b>{job.companyName}</b>
+                    </span>
+                    <br />
+                    <span>{job.jobTitle}</span>
                   </li>
                 ))}
             </ul>
